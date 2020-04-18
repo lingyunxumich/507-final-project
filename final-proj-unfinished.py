@@ -77,20 +77,6 @@ def make_url_request_using_cache(url, cache):
         return cache[url]
 
 
-
-'''
-class Movie:
-    def __init__(self, name, year, rating, country, url):
-        self.name = name
-        self.year = year
-        self.rating = rating
-        self.country = country
-        self.url = url
-
-    def info(self):
-        return self.name + ' (' + self.year + '): ' + self.rating + ' ' + self.country + ' ' + self.url
-'''
-
 def build_movie_url_dict():
     movie_url_dict = {}
 
@@ -111,14 +97,14 @@ def build_movie_url_dict():
         movie_url_dict[movie] = movie_url_complete
     return movie_url_dict
 
+
 def get_movie_rank():
     movie_rank = {}
 
     baseurl = 'https://www.imdb.com/chart/top/?ref_=nv_mv_250'
     #response = requests.get(baseurl)
-    url_text = make_url_request_using_cache(baseurl, CACHE_DICT)
-
     #soup = BeautifulSoup(response.text, 'html.parser')
+    url_text = make_url_request_using_cache(baseurl, CACHE_DICT)
     soup = BeautifulSoup(url_text, 'html.parser')
 
     all_movies_td = soup.find_all('td', class_='titleColumn')
@@ -127,30 +113,9 @@ def get_movie_rank():
         rank_raw = movie_td.text.strip()[:3]
         rank= rank_raw.rstrip().replace('.', '')
         movie_rank[movie] = rank
-    
+
     return movie_rank
     
-'''
-# Access an individual movie page:
-def get_movie_instance(movie_url):
-    response2 = requests.get(movie_url)
-    soup = BeautifulSoup(response2.text, 'html.parser')
-
-    name_parent = soup.find('div', class_='title_wrapper')
-    name_year = name_parent.find('h1').text.strip()
-    name = name_year.split('(')[0]
-    year = name_year.split('(')[1][:4]
-    rating = soup.find('span', itemprop='ratingValue').text.strip()
-
-    genre_tag = name_parent.find('div', class_='subtext')
-    genres = genre_tag.find_all('a')
-    for g in genres[:-1]:
-        genre= g.text
-    country = genres[-1].text.strip().split('(')[1][:-1]
-    url = movie_url
-
-    return Movie(name, year, rating, country, url)
-'''   
 
 def get_movie_dict(movie_url):
 
@@ -187,7 +152,6 @@ def get_movie_dict(movie_url):
     return movie_dict
 
 
-# Parse the genre page:
 def get_genre():
     genre_url = 'https://help.imdb.com/article/contribution/titles/genres/GZDRMS6R742JRGAG#'
     #response3 = requests.get(genre_url)
@@ -219,12 +183,28 @@ def create_db():
     create_movies_sql = '''
         CREATE TABLE IF NOT EXISTS "Movies" (
             "Id" INTEGER PRIMARY KEY AUTOINCREMENT, 
-            "MovieId" INTEGER,
-            "Year" INTEGER, 
-            "Rating" REAL,
-            "CountryId" INTEGER,
-            "Genre" TEXT,
-            "URL" TEXT
+            "MovieId" INTEGER NOT NULL,
+            "Year" INTEGER NOT NULL, 
+            "Rating" REAL NOT NULL,
+            "CountryId" INTEGER NOT NULL,
+            "Genre" TEXT NOT NULL,
+            "URL" TEXT NOT NULL
+        )
+    '''
+    create_movie_rank_sql = '''
+        CREATE TABLE IF NOT EXISTS "MovieRank" (
+            "Id" INTEGER PRIMARY KEY AUTOINCREMENT, 
+            "MovieName" TEXT NOT NULL,
+            "Rank" INTEGER NOT NULL
+        )
+    '''
+    create_countries_sql = '''
+        CREATE TABLE IF NOT EXISTS 'Countries'(
+            'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+            'EnglishName' TEXT NOT NULL,
+            'Region' TEXT NOT NULL,
+            'Subregion' TEXT NOT NULL,
+            'Population' INTEGER NOT NULL
         )
     '''
     create_genres_sql = '''
@@ -234,36 +214,15 @@ def create_db():
         )
     '''
 
-    create_movie_rank_sql = '''
-        CREATE TABLE IF NOT EXISTS "MovieRank" (
-            "Id" INTEGER PRIMARY KEY AUTOINCREMENT, 
-            "MovieName" TEXT,
-            "Rank" INTEGER
-        )
-    '''
-
-    create_countries_sql = '''
-        CREATE TABLE IF NOT EXISTS 'Countries'(
-            'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
-            'Alpha2' TEXT NOT NULL,
-            'Alpha3' TEXT NOT NULL,
-            'EnglishName' TEXT NOT NULL,
-            'Region' TEXT NOT NULL,
-            'Subregion' TEXT NOT NULL,
-            'Population' INTEGER NOT NULL,
-            'Area' REAL 
-        )
-    '''
-
     cur.execute(drop_genres_sql)
-    #cur.execute(drop_movie_rank_sql)
-    #cur.execute(drop_countries_sql)
-    #cur.execute(drop_movies_sql)
+    cur.execute(drop_movie_rank_sql)
+    cur.execute(drop_countries_sql)
+    cur.execute(drop_movies_sql)
 
     cur.execute(create_genres_sql)
-    #cur.execute(create_movie_rank_sql)
-    #cur.execute(create_countries_sql)
-    #cur.execute(create_movies_sql)
+    cur.execute(create_movie_rank_sql)
+    cur.execute(create_countries_sql)
+    cur.execute(create_movies_sql)
     conn.commit()
     conn.close()
 
@@ -325,6 +284,7 @@ def load_movies():
     conn.commit()
     conn.close()
 
+
 def load_genres():
 
     insert_genre_sql = '''
@@ -357,6 +317,7 @@ def load_movie_rank():
     conn.commit()
     conn.close()
 
+
 def load_countries(): 
     base_url = 'https://restcountries.eu/rest/v2/all'
     #countries = requests.get(base_url).json()
@@ -365,7 +326,7 @@ def load_countries():
 
     insert_country_sql = '''
         INSERT INTO Countries
-        VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (NULL, ?, ?, ?, ?)
     '''
 
     conn = sqlite3.connect(DB_NAME)
@@ -373,30 +334,24 @@ def load_countries():
     for c in countries:
         cur.execute(insert_country_sql,
             [
-                c['alpha2Code'],
-                c['alpha3Code'],
                 c['name'], 
                 c['region'],
                 c['subregion'],
-                c['population'],
-                c['area']
+                c['population']
             ]
         )
     conn.commit()
     conn.close()
 
+
 if __name__ == "__main__":
 
     CACHE_DICT = load_cache()
 
-    #create_db()
-    #load_movies()
-    #load_genres()
-    #load_movie_rank()
-    #load_countries()
+    create_db()
+    #load_genres() # I doubt if there's any need to creat a Genre table separaely.  
+    load_movie_rank()
+    load_countries()
+    load_movies()
    
-    #url = build_movie_url_dict()
-    #print(url)
-
-    #rank = get_movie_rank()
-    #print(rank)
+    
