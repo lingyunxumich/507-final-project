@@ -4,7 +4,7 @@ This project enables users to explore and interact with the top rated 250 movies
 
 ###Authorization: No API keys are needed to run the files. 
 
-###Python packages needed: bs4, requests, sqlite3, flask, plotly.py.
+###Python packages required: bs4, requests, sqlite3, flask, plotly.py.
 
 ###Usage:
 
