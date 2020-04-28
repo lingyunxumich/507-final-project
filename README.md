@@ -1,10 +1,17 @@
 # 507-final-project - Explore the Top Rated 250 IMDB Movies!
 
+This project enables users to explore and interact with the top rated 250 movies collected from IMDB.com. 
+
 No authorization/API keys are needed to run the files. 
 
-Python packages needed: 
-bs4, requests, sqlite3, flask, plotly.py.
+Python packages needed: bs4, requests, sqlite3, flask, plotly.py.
 
-final_proj_part1.py is to be run first. This file is to collect data through web scraping and API, and create and populate a database for further data analysis. 
+Usage:
 
-final_proj_part2_flask.py is to be run second. This file is to create a flask app which will perform data analysis, interact with users, and present the results in various formats. After running the file, users need to go to http://127.0.0.1:5000/ in their web browser to interact with the app and view the data presented in different formats. 
+Step 1: Run final_proj_part1.py. 
+This file is to collect data through web scraping and API, and create and populate a database for further data analysis. 
+
+Step 2: Run final_proj_part2_flask.py. 
+This file is to create a flask app which will perform data analysis, interact with users, and present the results in various formats. 
+
+Step 3: Go to http://127.0.0.1:5000/ in a web browser to interact with the app and view the data presented in different formats. 
