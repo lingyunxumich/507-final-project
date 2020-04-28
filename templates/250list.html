@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>250list</title>
+</head>
+<body style="font-family:Times New Roman">
+    <h1>
+        The top 250 movie list is...
+    </h1>
+   
+    <ol>
+    {% for (url, movie) in movies %}
+        <li><a href="{{url}}">{{movie}}</a></li>
+    {% endfor %}
+    </ol>
+</body>
+</html>

@@ -78,13 +78,11 @@ def make_url_request_using_cache(url, cache):
 
 
 def build_movie_url_dict():
+
     movie_url_dict = {}
 
     baseurl = 'https://www.imdb.com/chart/top/?ref_=nv_mv_250'
-    #response = requests.get(baseurl)
     url_text = make_url_request_using_cache(baseurl, CACHE_DICT)
-
-    #soup = BeautifulSoup(response.text, 'html.parser')
     soup = BeautifulSoup(url_text, 'html.parser')
 
     all_movies_td = soup.find_all('td', class_='titleColumn')
@@ -95,15 +93,15 @@ def build_movie_url_dict():
         movie_url_complete = 'https://www.imdb.com' + movie_url
         movie_url_list.append(movie_url_complete)
         movie_url_dict[movie] = movie_url_complete
+
     return movie_url_dict
 
 
 def get_movie_rank():
+
     movie_rank = {}
 
     baseurl = 'https://www.imdb.com/chart/top/?ref_=nv_mv_250'
-    #response = requests.get(baseurl)
-    #soup = BeautifulSoup(response.text, 'html.parser')
     url_text = make_url_request_using_cache(baseurl, CACHE_DICT)
     soup = BeautifulSoup(url_text, 'html.parser')
 
@@ -118,13 +116,10 @@ def get_movie_rank():
     
 
 def get_movie_dict(movie_url):
-
+    
     movie_dict = {}
 
     url_text = make_url_request_using_cache(movie_url, CACHE_DICT)
-
-    #response2 = requests.get(movie_url)
-    #soup = BeautifulSoup(response2.text, 'html.parser')
     soup = BeautifulSoup(url_text, 'html.parser')
 
     name_parent = soup.find('div', class_='title_wrapper')
@@ -152,31 +147,13 @@ def get_movie_dict(movie_url):
     return movie_dict
 
 
-def get_genre():
-    genre_url = 'https://help.imdb.com/article/contribution/titles/genres/GZDRMS6R742JRGAG#'
-    #response3 = requests.get(genre_url)
-    #soup = BeautifulSoup(response3.text, 'html.parser')
-    url_text = make_url_request_using_cache(genre_url, CACHE_DICT)
-    soup = BeautifulSoup(url_text, 'html.parser')
-
-    genre_parent = soup.find('div', id='article_content')
-    genre_subparent = genre_parent.find_all('p')[1]
-    genres = genre_subparent.find_all('a')
-    genre_list = []
-    for genre in genres:
-        genre = genre.string.strip()
-        genre_list.append(genre)
-
-    return genre_list
-
-
 DB_NAME = 'imdb-movies.sqlite'
+
 def create_db():
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
     drop_movies_sql = 'DROP TABLE IF EXISTS "Movies"'
-    drop_genres_sql = 'DROP TABLE IF EXISTS "Genres"'
     drop_movie_rank_sql = 'DROP TABLE IF EXISTS "MovieRank"'
     drop_countries_sql = 'DROP TABLE IF EXISTS "Countries"'
     
@@ -202,24 +179,15 @@ def create_db():
         CREATE TABLE IF NOT EXISTS 'Countries'(
             'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
             'EnglishName' TEXT NOT NULL,
-            'Region' TEXT NOT NULL,
+            'Region' TEXT,
             'Subregion' TEXT NOT NULL,
             'Population' INTEGER NOT NULL
         )
     '''
-    create_genres_sql = '''
-        CREATE TABLE IF NOT EXISTS "Genres" (
-            "Id" INTEGER PRIMARY KEY AUTOINCREMENT, 
-            "Genre" TEXT NOT NULL
-        )
-    '''
-
-    cur.execute(drop_genres_sql)
     cur.execute(drop_movie_rank_sql)
     cur.execute(drop_countries_sql)
     cur.execute(drop_movies_sql)
 
-    cur.execute(create_genres_sql)
     cur.execute(create_movie_rank_sql)
     cur.execute(create_countries_sql)
     cur.execute(create_movies_sql)
@@ -285,22 +253,6 @@ def load_movies():
     conn.close()
 
 
-def load_genres():
-
-    insert_genre_sql = '''
-        INSERT INTO Genres
-        VALUES (NULL, ?)
-    '''
-
-    conn = sqlite3.connect(DB_NAME)
-    cur = conn.cursor()
-    genre_list = get_genre()
-    for genre in genre_list:
-        cur.execute(insert_genre_sql, [genre])
-    conn.commit()
-    conn.close()
-
-
 def load_movie_rank():
 
     insert_movie_rank_sql = '''
@@ -320,7 +272,6 @@ def load_movie_rank():
 
 def load_countries(): 
     base_url = 'https://restcountries.eu/rest/v2/all'
-    #countries = requests.get(base_url).json()
     countries_str = make_url_request_using_cache(base_url, CACHE_DICT)
     countries = json.loads(countries_str)
 
@@ -348,10 +299,8 @@ if __name__ == "__main__":
 
     CACHE_DICT = load_cache()
 
-    create_db()
-    #load_genres() # I doubt if there's any need to creat a Genre table separaely.  
+    create_db() 
     load_movie_rank()
     load_countries()
     load_movies()
    
-    

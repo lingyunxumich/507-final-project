@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF8"/>
+    <title>Movies Home</title>
+</head>
+<body>
+    <h1>Explore the Top Rated 250 Movies from IMDB.com! </h1>
+
+    <form action='/250list' method='POST'>
+        <h3>
+        View the complete top 250 movie list with links!
+            
+        </h3>
+    
+        <input type='submit' value='Get the Top 250 Movie List'/>
+    
+    </form>
+    <br/>
+
+    <form action='/results' method='POST'>
+    <p>
+        <h3>Sort and filter the movies as you like!</h3>
+    Sort by: <br/>
+        <input type='radio' name='sort' 
+                value='Rank' checked='checked'/> Rank <br/>
+        <input type='radio' name='sort' 
+                value='Year'/> Year <br/>
+        
+    </p>
+
+    <p>
+    Sort direction: <br/>
+        <input type='radio' name='dir'
+            value='asc' checked='checked'/>Low to High<br/>
+        <input type='radio' name='dir'
+            value='desc'/>High to Low<br/>
+
+    </p>
+
+    <p>
+        Filter by region: <br/>
+        <select name='region'>
+            <option value='All'>All regions</option>
+            <option value='Americas'>Americas</option>
+            <option value='Asia'>Asia</option>
+            <option value='Europe'>Europe</option>
+            <option value='Oceania'>Oceania</option>
+        </select>
+    </p>
+        
+    <p>
+        <input type='checkbox' name='plot'/>Plot results?<br/>
+    </p>
+
+    <input type='submit' value='Get Movies'/>
+
+    </form>
+
+</body>
+</html>
