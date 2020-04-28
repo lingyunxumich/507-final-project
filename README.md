@@ -2,11 +2,11 @@
 
 This project enables users to explore and interact with the top rated 250 movies collected from IMDB.com. 
 
-No authorization/API keys are needed to run the files. 
+###Authorization: No API keys are needed to run the files. 
 
-Python packages needed: bs4, requests, sqlite3, flask, plotly.py.
+###Python packages needed: bs4, requests, sqlite3, flask, plotly.py.
 
-Usage:
+###Usage:
 
 Step 1: Run final_proj_part1.py. 
 This file is to collect data through web scraping and API, and create and populate a database for further data analysis. 
