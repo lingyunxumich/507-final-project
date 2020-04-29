@@ -1,6 +1,6 @@
-# 507-final-project - Explore the Top Rated 250 IMDB Movies!
+# 507-final-project - Explore the Top Rated IMDB Movies!
 
-This project enables users to explore and interact with the top rated 250 movies collected from IMDB.com. 
+This project enables users to explore and interact with the 250 top rated movies collected from IMDB.com. 
 
 ### Authorization: 
 No API keys are needed to run the files. 
